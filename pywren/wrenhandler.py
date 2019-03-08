@@ -21,7 +21,6 @@ import os
 import shutil
 import signal
 import subprocess
-import shlex
 import sys
 import tarfile
 import time
@@ -360,15 +359,13 @@ def generic_handler(event, context_dict, custom_handler_env=None):
         # This is copied from http://stackoverflow.com/a/17698359/4577954
         # reasons for setting process group: http://stackoverflow.com/a/4791612
 
-        cmd_list = shlex.split(cmdstr)
-
         if os.name == 'nt':
-            process = subprocess.Popen(cmd_list, env=local_env,
+            process = subprocess.Popen(cmdstr, shell=True, env=local_env,
                                        bufsize=1, stdout=subprocess.PIPE,
                                        creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
         else:
-            process = subprocess.Popen(cmd_list, # pylint: disable=subprocess-popen-preexec-fn
-                                       env=local_env, bufsize=1,
+            process = subprocess.Popen(cmdstr, # pylint: disable=subprocess-popen-preexec-fn
+                                       shell=True, env=local_env, bufsize=1,
                                        stdout=subprocess.PIPE, preexec_fn=os.setsid)
         logger.info("launched process")
 
